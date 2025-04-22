@@ -26,4 +26,6 @@ col_names_ch <- data_layout_ch[[6]]
 #changing the column names of chhv1 file
 colnames(data_ch) <- col_names_ch[-1]
 #Educational level wrt gender ON basiss of sector wise
-with(data_cp, table(GEDU_LVL, SEX, SEC))
+data_cp$SEC <- factor(data_cp$SEC, levels = c(1, 2), labels = c(" Rural", " Urban"))
+#table of edu , sex wrt sec
+TABLE_EDU_SEX_SEC <- with(data_cp,table(GEDU_LVL,SEX,SEC))
