@@ -1,0 +1,29 @@
+  # Only once
+library(readxl)
+library(readr)
+#loading layout for cperv1 file
+data_layout_cp <- read_excel("C:/Users/adi17/Desktop/project optimization/Data_LayoutPLFS_Calendar_2024.xlsx", sheet = "cperv1")
+#dividing the data into widths
+cp_widths <- as.numeric(data_layout_cp[[4]] , na.rm = TRUE)
+#loading the cperv1 file
+data_cp <- read_fwf("C:/Users/adi17/Desktop/project optimization/CPERV1.TXT", 
+                 col_positions = fwf_widths(cp_widths[-1]) , 
+                 col_types = cols(.default = "c"))
+
+col_names_cp <- data_layout_cp[[5]]
+#changing the column names of cperv1 file
+colnames(data_cp) <- col_names_cp[-1]
+#loading layout for chhv1 file
+data_layout_ch<- read_excel("C:/Users/adi17/Desktop/project optimization/Data_LayoutPLFS_Calendar_2024.xlsx", sheet = "chhv1")
+#dividing the data into widths
+ch_widths <- as.numeric(data_layout_ch[[5]] , na.rm = TRUE)
+#loading the chhv1 file
+data_ch <- read_fwf("C:/Users/adi17/Desktop/project optimization/CHHV1.TXT", 
+                 col_positions = fwf_widths(ch_widths[-1]), 
+                 col_types = cols(.default = "c"))
+
+col_names_ch <- data_layout_ch[[6]]
+#changing the column names of chhv1 file
+colnames(data_ch) <- col_names_ch[-1]
+#Educational level wrt gender ON basiss of sector wise
+with(data_cp, table(GEDU_LVL, SEX, SEC))
