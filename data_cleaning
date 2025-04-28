@@ -1,14 +1,15 @@
-  # Only once
+# Only once
 library(readxl)
 library(readr)
+library(dplyr)
 #loading layout for cperv1 file
 data_layout_cp <- read_excel("C:/Users/adi17/Desktop/project optimization/Data_LayoutPLFS_Calendar_2024.xlsx", sheet = "cperv1")
 #dividing the data into widths
 cp_widths <- as.numeric(data_layout_cp[[4]] , na.rm = TRUE)
 #loading the cperv1 file
 data_cp <- read_fwf("C:/Users/adi17/Desktop/project optimization/CPERV1.TXT", 
-                 col_positions = fwf_widths(cp_widths[-1]) , 
-                 col_types = cols(.default = "c"))
+                    col_positions = fwf_widths(cp_widths[-1]) , 
+                    col_types = cols(.default = "c"))
 
 col_names_cp <- data_layout_cp[[5]]
 #changing the column names of cperv1 file
@@ -19,13 +20,24 @@ data_layout_ch<- read_excel("C:/Users/adi17/Desktop/project optimization/Data_La
 ch_widths <- as.numeric(data_layout_ch[[5]] , na.rm = TRUE)
 #loading the chhv1 file
 data_ch <- read_fwf("C:/Users/adi17/Desktop/project optimization/CHHV1.TXT", 
-                 col_positions = fwf_widths(ch_widths[-1]), 
-                 col_types = cols(.default = "c"))
+                    col_positions = fwf_widths(ch_widths[-1]), 
+                    col_types = cols(.default = "c"))
 
 col_names_ch <- data_layout_ch[[6]]
 #changing the column names of chhv1 file
 colnames(data_ch) <- col_names_ch[-1]
-#Educational level wrt gender ON basiss of sector wise
-data_cp$SEC <- factor(data_cp$SEC, levels = c(1, 2), labels = c(" Rural", " Urban"))
-#table of edu , sex wrt sec
-TABLE_EDU_SEX_SEC <- with(data_cp,table(GEDU_LVL,SEX,SEC))
+
+
+##data merger
+# Repeat each row in chhv1 according to HH_SIZE
+chhv1_expanded <- data_ch[rep(seq_len(nrow(data_ch)), times = data_ch$HH_SIZE), ]
+# Reset row numbers to match cperv1
+row.names(chhv1_expanded) <- NULL
+row.names(data_cp) <- NULL
+
+# Bind the data side by side
+data_merged <- bind_cols(data_cp,chhv1_expanded[18:38])
+
+
+## Convert columns 6 to ncol(data_merged) from character to integer
+data_merged[ , 6:ncol(data_merged)] <- lapply(data_merged[ , 6:ncol(data_merged)], function(x) as.integer(as.character(x)))
